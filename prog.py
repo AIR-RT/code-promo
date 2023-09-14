@@ -46,7 +46,6 @@ try:
         for line_number, row in enumerate(csv_reader, start=2):  # Start line numbering from 2
                 email = row[1] # get the e-mail
                 RandCode = ''.join(random.choice(chars) for _ in range(size)) # gen the code
-                data.append([email,RandCode]) # store both e-mail and code
                 MailList[i]=email # second time storing e-mail
                 CodeList[i]=RandCode # second time storing the code
                 i+=1 # increment the loop to update the pointer
@@ -55,17 +54,6 @@ except FileNotFoundError:
     print(f"File '{csv_db}' not found.")
 except Exception as e:
     print(f"An error occurred while searching for the file: {str(e)}")
-
-
-try:
-    with open(csv_save, mode='w', newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        writer.writerows(data) # we write data for the user in the specified file.
-        # then you will need to put all the code to HelloAsso
-
-except Exception as e:
-     print(f"An error occurred while storing the data: {str(e)}")
-
 
 try:
     message = MIMEMultipart() # Create the email message
@@ -87,9 +75,19 @@ try:
         
         server.sendmail(sender_email, receiver_email, message.as_string())
         print('Email sent successfully!') # one prompt for each e-mail
+        data.append([receiver_email,RandCode]) # store both e-mail and code to then print them in the file
         server.quit() # we disconnect
         # please note that if we don't disconnect and just kept the connexion while we are sending all the mail
         # we could expect to be faster, but this isn't that important in our case.
 
 except Exception as e:
     print(f'Error: {str(e)}')
+
+try:
+    with open(csv_save, mode='w', newline='') as csv_file:
+        writer = csv.writer(csv_file, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerows(data) # we write data for the user we sent a e-mail to in the specified file.
+        # then you will need to put all the code to HelloAsso
+
+except Exception as e:
+     print(f"An error occurred while storing the data: {str(e)}")
